@@ -6,4 +6,8 @@ class StaticPagesController < ApplicationController
   def help
     # render html: "this is help"
   end
+
+  def about
+    # render html: "this is help"
+  end
 end
