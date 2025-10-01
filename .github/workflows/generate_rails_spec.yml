@@ -30,5 +30,6 @@ jobs:
           if [ -n "$(git status --porcelain spec.md)" ]; then
             git add spec.md
             git commit -m "chore: auto-update spec.md from routes"
+            git pull --rebase origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
           fi
