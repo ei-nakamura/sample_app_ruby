@@ -1,0 +1,34 @@
+name: Generate Rails Spec
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  rails-spec:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:14
+        ports: ['5432:5432']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+      - run: |
+          bundle install
+          bin/rails routes --format=json > routes.json
+          python .github/scripts/rails_spec_to_md.py routes.json spec.md
+      - run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain spec.md)" ]; then
+            git add spec.md
+            git commit -m "chore: auto-update spec.md from routes"
+            git push origin HEAD:${{ github.head_ref }}
+          fi
